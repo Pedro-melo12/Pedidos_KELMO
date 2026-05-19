@@ -1,0 +1,71 @@
+{
+  "timestamp": "2026-03-30T13:49:33.087Z",
+  "usuarios": [
+    {
+      "id": "a0ed7da6-7399-4168-8f76-cb533a82fc37",
+      "nome": "Pedro de melo albuquerque",
+      "email": "pedro@gmail.com",
+      "senha": "$2b$10$yo1BJoCq78Bj6W2dhFivWuKM8iOl51PZLZQcIpekKuqoH5vbjs64W",
+      "role": "ADMIN",
+      "created_at": "2026-03-19T18:51:05.123Z",
+      "updated_at": "2026-03-19T18:51:05.123Z"
+    },
+    {
+      "id": "facffa5f-118b-4b87-9ab6-e64e7024c5f2",
+      "nome": "Test",
+      "email": "test2@test.com",
+      "senha": "$2b$10$uEk/LfZEBomaFbk/m0AhZeNmDslupElX1W1E8jwYIrK.cIr6jxCvq",
+      "role": "USER",
+      "created_at": "2026-03-19T18:35:45.639Z",
+      "updated_at": "2026-03-19T18:35:45.639Z"
+    }
+  ],
+  "produtos": [
+    {
+      "id": "6e053587-0200-4b90-8229-cb3c874d2853",
+      "nome": "mesa",
+      "descricao": "",
+      "preco": 200,
+      "estoque": 20,
+      "created_at": "2026-03-19T18:53:58.190Z",
+      "updated_at": "2026-03-19T18:53:58.190Z"
+    },
+    {
+      "id": "daa42951-6d39-449e-ad9b-353c4c2fe89c",
+      "nome": "colchão",
+      "descricao": "",
+      "preco": 100,
+      "estoque": 10,
+      "created_at": "2026-03-19T18:53:47.595Z",
+      "updated_at": "2026-03-19T18:53:47.595Z"
+    }
+  ],
+  "pedidos": [
+    {
+      "id": "721eac0c-1cf8-40df-9bd5-fa3bf2c96a03",
+      "usuario_id": "a0ed7da6-7399-4168-8f76-cb533a82fc37",
+      "status": "PENDENTE",
+      "valor_total": 500,
+      "created_at": "2026-03-19T18:55:15.203Z",
+      "updated_at": "2026-03-19T18:55:15.203Z"
+    }
+  ],
+  "pedidoItens": [
+    {
+      "id": "d16aeed1-5ff8-4386-b0b5-36f133ba0c4c",
+      "pedido_id": "721eac0c-1cf8-40df-9bd5-fa3bf2c96a03",
+      "produto_id": "6e053587-0200-4b90-8229-cb3c874d2853",
+      "quantidade": 2,
+      "preco_unitario": 200,
+      "subtotal": 400
+    },
+    {
+      "id": "e2a5268c-8111-432b-b059-3d52f36bd613",
+      "pedido_id": "721eac0c-1cf8-40df-9bd5-fa3bf2c96a03",
+      "produto_id": "daa42951-6d39-449e-ad9b-353c4c2fe89c",
+      "quantidade": 1,
+      "preco_unitario": 100,
+      "subtotal": 100
+    }
+  ]
+}

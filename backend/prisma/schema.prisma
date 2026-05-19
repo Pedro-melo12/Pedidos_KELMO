@@ -1,0 +1,89 @@
+// This is your Prisma schema file.
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum StatusPedido {
+  PENDENTE
+  CONCLUIDO
+  CANCELADO
+}
+
+model Usuario {
+  id         String   @id @default(uuid())
+  nome       String
+  email      String   @unique
+  senha      String
+  role       Role     @default(USER)
+  pedidos    Pedido[]
+  logs       Log[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Produto {
+  id         String       @id @default(uuid())
+  nome       String
+  descricao  String?
+  preco      Float
+  estoque    Int          @default(0)
+  itens      PedidoItem[]
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+}
+
+model Pedido {
+  id          String       @id @default(uuid())
+  usuario_id  String
+  usuario     Usuario      @relation(fields: [usuario_id], references: [id])
+  status      StatusPedido @default(PENDENTE)
+  valor_total Float
+  itens       PedidoItem[]
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+}
+
+model PedidoItem {
+  id             String  @id @default(uuid())
+  pedido_id      String
+  pedido         Pedido  @relation(fields: [pedido_id], references: [id])
+  produto_id     String
+  produto        Produto @relation(fields: [produto_id], references: [id])
+  quantidade     Int
+  preco_unitario Float
+  subtotal       Float
+}
+
+model Configuracao {
+  id    String @id @default(uuid())
+  chave String @unique
+  valor String // JSON string
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Log {
+  id         String   @id @default(uuid())
+  usuario_id String?
+  usuario    Usuario? @relation(fields: [usuario_id], references: [id])
+  evento     String
+  acao       String?
+  descricao  String?
+  metadata   Json?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("log")
+}
