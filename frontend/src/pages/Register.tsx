@@ -13,6 +13,12 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!isPasswordValid(senha)) {
+      setError('A senha deve ter no minimo 10 caracteres, letra maiuscula, letra, numero e caractere especial.');
+      return;
+    }
+
     setLoading(true);
     try {
       await api.post('/auth/register', { nome, email, senha });
@@ -24,6 +30,14 @@ export default function Register() {
       setLoading(false);
     }
   };
+
+  const isPasswordValid = (value: string) => (
+    value.length >= 10 &&
+    /[A-Za-z]/.test(value) &&
+    /[0-9]/.test(value) &&
+    /[^A-Za-z0-9]/.test(value) &&
+    /[A-Z]/.test(value)
+  );
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -54,11 +68,16 @@ export default function Register() {
             </div>
             <div>
               <input
-                type="password" required
+                type="password" required minLength={10}
+                pattern="^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.*[A-Z]).{10,}$"
+                title="Minimo de 10 caracteres, com letra maiuscula, letra, numero e caractere especial."
                 value={senha} onChange={e => setSenha(e.target.value)}
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                 placeholder="Senha"
               />
+              <p className="mt-2 text-xs text-gray-500">
+                Minimo de 10 caracteres, com letra maiuscula, letra, numero e caractere especial.
+              </p>
             </div>
           </div>
 

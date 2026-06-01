@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { Download, Users, ClipboardList } from 'lucide-react';
+import { Download, Users, ClipboardList, Edit2, Trash2, Save, X } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState<any[]>([]);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [editingUser, setEditingUser] = useState({ nome: '', email: '', role: 'USER' });
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [logsLoading, setLogsLoading] = useState(false);
@@ -130,6 +132,46 @@ export default function AdminDashboard() {
     }
   };
 
+  const startEditUser = (user: any) => {
+    setEditingUserId(user.id);
+    setEditingUser({ nome: user.nome, email: user.email, role: user.role });
+  };
+
+  const cancelEditUser = () => {
+    setEditingUserId(null);
+    setEditingUser({ nome: '', email: '', role: 'USER' });
+  };
+
+  const handleSaveUser = async (userId: string) => {
+    if (!editingUser.nome.trim() || !editingUser.email.trim()) {
+      alert('Nome e email sao obrigatorios.');
+      return;
+    }
+
+    try {
+      await api.put(`/admin/users/${userId}`, {
+        nome: editingUser.nome.trim(),
+        email: editingUser.email.trim(),
+        role: editingUser.role,
+      });
+      cancelEditUser();
+      fetchUsers();
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Erro ao atualizar usuario.');
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, nome: string) => {
+    if (!window.confirm(`Excluir o usuario ${nome}? Essa acao nao pode ser desfeita.`)) return;
+
+    try {
+      await api.delete(`/admin/users/${userId}`);
+      fetchUsers();
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Erro ao excluir usuario.');
+    }
+  };
+
   const handleRestoreBackup = async () => {
     if (!selectedFile) return alert('Selecione um arquivo de backup primeiro!');
     if (!window.confirm('Atenção: Restaurar um backup irá apagar todos os dados atuais. Continuar?')) return;
@@ -245,20 +287,88 @@ export default function AdminDashboard() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {users.map((u) => (
                   <tr key={u.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{u.nome}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{u.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {editingUserId === u.id ? (
+                        <input
+                          type="text"
+                          value={editingUser.nome}
+                          onChange={(e) => setEditingUser({ ...editingUser, nome: e.target.value })}
+                          className="w-44 rounded-md border border-gray-300 px-3 py-2 text-sm"
+                        />
+                      ) : (
+                        u.nome
+                      )}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${u.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'}`}>
-                        {u.role}
-                      </span>
+                      {editingUserId === u.id ? (
+                        <input
+                          type="email"
+                          value={editingUser.email}
+                          onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
+                          className="w-64 rounded-md border border-gray-300 px-3 py-2 text-sm"
+                        />
+                      ) : (
+                        u.email
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {editingUserId === u.id ? (
+                        <select
+                          value={editingUser.role}
+                          onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
+                          className="rounded-md border border-gray-300 px-3 py-2 text-sm bg-white"
+                        >
+                          <option value="USER">USER</option>
+                          <option value="ADMIN">ADMIN</option>
+                        </select>
+                      ) : (
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${u.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'}`}>
+                          {u.role}
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleRoleChange(u.id, u.role)}
-                        className="text-primary-600 hover:text-primary-900 font-medium"
-                      >
-                        Mudar Papel
-                      </button>
+                      {editingUserId === u.id ? (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleSaveUser(u.id)}
+                            className="inline-flex items-center gap-1 rounded-md bg-primary-600 px-3 py-2 text-white hover:bg-primary-700"
+                            title="Salvar usuario"
+                          >
+                            <Save className="h-4 w-4" /> Salvar
+                          </button>
+                          <button
+                            onClick={cancelEditUser}
+                            className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-3 py-2 text-gray-700 hover:bg-gray-50"
+                            title="Cancelar edicao"
+                          >
+                            <X className="h-4 w-4" /> Cancelar
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => startEditUser(u)}
+                            className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-900 font-medium"
+                            title="Editar usuario"
+                          >
+                            <Edit2 className="h-4 w-4" /> Editar
+                          </button>
+                          <button
+                            onClick={() => handleRoleChange(u.id, u.role)}
+                            className="text-gray-700 hover:text-gray-900 font-medium"
+                          >
+                            Mudar Papel
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(u.id, u.nome)}
+                            className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 font-medium"
+                            title="Excluir usuario"
+                          >
+                            <Trash2 className="h-4 w-4" /> Excluir
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}

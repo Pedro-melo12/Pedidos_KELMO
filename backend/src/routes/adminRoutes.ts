@@ -13,6 +13,7 @@ router.use(authMiddleware);
 router.use(adminMiddleware);
 
 router.get('/users', adminController.getUsers.bind(adminController));
+router.put('/users/:id', adminController.updateUser.bind(adminController));
 router.patch('/users/:id/role', adminController.changeRole.bind(adminController));
 router.delete('/users/:id', adminController.deleteUser.bind(adminController));
 

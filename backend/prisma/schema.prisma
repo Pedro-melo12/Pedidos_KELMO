@@ -22,15 +22,18 @@ enum StatusPedido {
 }
 
 model Usuario {
-  id         String   @id @default(uuid())
-  nome       String
-  email      String   @unique
-  senha      String
-  role       Role     @default(USER)
-  pedidos    Pedido[]
-  logs       Log[]
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id              String            @id @default(uuid())
+  nome            String
+  email           String            @unique
+  senha           String
+  role            Role              @default(USER)
+  falhas_login    Int               @default(0)
+  bloqueado_ate   DateTime?
+  pedidos         Pedido[]
+  logs            Log[]
+  senhaHistoricos SenhaHistorico[]
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
 }
 
 model Produto {
@@ -86,4 +89,14 @@ model Log {
   updated_at DateTime @updatedAt
 
   @@map("log")
+}
+
+model SenhaHistorico {
+  id         String   @id @default(uuid())
+  usuario_id String
+  usuario    Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  senha_hash String
+  created_at DateTime @default(now())
+
+  @@map("senha_historico")
 }

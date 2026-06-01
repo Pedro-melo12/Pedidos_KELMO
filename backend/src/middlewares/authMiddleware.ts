@@ -6,10 +6,10 @@ interface TokenPayload {
   role: string;
 }
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    return res.status(401).json({ error: 'Token não fornecido' });
+    return res.status(401).json({ error: 'Token nao fornecido' });
   }
 
   const [, token] = authHeader.split(' ');
@@ -20,14 +20,14 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     (req as any).user = decoded;
     return next();
   } catch (err) {
-    return res.status(401).json({ error: 'Token inválido' });
+    return res.status(401).json({ error: 'Token invalido' });
   }
 };
 
-export const adminMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const adminMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const user = (req as any).user as TokenPayload;
   if (!user || user.role !== 'ADMIN') {
-    return res.status(403).json({ error: 'Acesso negado: Requer privilégios de administrador' });
+    return res.status(403).json({ error: 'Acesso negado: Requer privilegios de administrador' });
   }
   return next();
 };
